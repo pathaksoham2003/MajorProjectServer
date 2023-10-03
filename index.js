@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-
+const client = require("./database/pgres.js");
 app = express();
 app.use(cors());
 
@@ -9,6 +9,6 @@ app.get("/",(req,res)=>{
 })
 
 app.use(express.json());
-app.listen(3001,()=>{
+app.listen(3002,()=>{
     console.log("Server started at port number 3001");
 })
