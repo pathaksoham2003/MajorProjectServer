@@ -15,50 +15,62 @@ const allUsers = async (req,res) => {
             res.status(400).json({message:`Error : ${err}`});
             return;
         }
-        res.status(200).json(result);
+        res.status(200).json(result.rows);
         return;
     })
 }
 
 const specificUser = (req,res) => {
-    const {id} = req.params;
-    client.query(`SELECT * FROM USERS_TABLE WHERE user_id = $1 `,[id],(err,result)=>{
+    const {google_id} = req.params;
+    client.query(`SELECT * FROM USERS_TABLE WHERE google_id = $1 `,[google_id],(err,result)=>{
         if(err){
             console.log(err);
             res.status(400).json({message:`Error ${err}`});
             return;
         }
-        req.status(200).json(result);
+        res.status(200).json(result.rows[0]);
         return;
     })
 }
 
 const createUser = (req,res) => {
-    const {user_id , name , email , google_id , picture , address} = req.body;
-    if(!user_id || !name || !email || !google_id || !picture || !address){
+    const { name , email , google_id , picture } = req.body;
+    if(!name || !email || !google_id || !picture){
         res.status(400).json({message:"Fill The Complete Data"});
         return;
     }
-    client.query(`SELECT user_id FROM USERS_TABLE WHERE user_id = $1 OR google_id=$2`,[user_id,google_id],(err,result)=>{
+    client.query(`SELECT * FROM USERS_TABLE WHERE google_id=$1`,[google_id],(err,result)=>{
         if(err){
             res.status(400).json({message:"Error quering to database"});
             return;
         }
-        console.log(result);
-        if(result !== null){
-            res.status(400).json({message:"User is already present"});
+        if(result.rows.length !== 0){
+            res.status(200).json(result.rows[0]);
             return;
         }
-        client.query(`INSERT INTO USERS_TABLE (name, email, google_id, picture, address)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING user_id`,[user_id , name , email , google_id , picture , address],(err,result)=>{
+        client.query(`INSERT INTO USERS_TABLE (name, email, google_id, picture)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *`,[ name , email , google_id , picture],(err,result)=>{
             if (err) {
-                console.error('Error inserting data:', err);
+                res.status(400).json({message:"Error quering to database"});
+                return;
               } else {
-                const insertedUserId = result.rows[0].user_id;
-                console.log(`User with ID ${insertedUserId} inserted successfully.`);
+                res.status(200).json(result.rows[0]);
+                return;
               }
         })
     })
 }
-module.exports = {allUsers,specificUser , createUser};
+
+const deleteUser = (req,res) => {
+    const {google_id} = req.params;
+    client.query(`DELETE FROM USERS_TABLE WHERE google_id = $1`,[google_id],(err,result)=>{
+        if(err){
+            res.status(400).json({message:"Error Quering the database"});
+            return;
+        }
+        res.status(200).json(result.rows);
+        return;
+    })
+}
+module.exports = {allUsers,specificUser , createUser , deleteUser};

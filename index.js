@@ -8,9 +8,10 @@ const userRouter = require("./routes/userRoutes.js");
 
 app = express();
 app.use(cors());
+app.use(express.json());
 
-app.use("/products",productRouter);
-app.use("/users",userRouter);
+app.use("/api/products",productRouter);
+app.use("/api/users",userRouter);
 
 app.get("/",(req,res)=>{
     res.status(200).json("<h1>Hello</h1>")

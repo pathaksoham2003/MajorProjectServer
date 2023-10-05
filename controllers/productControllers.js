@@ -8,4 +8,8 @@ const specificProduct = (req,res) => {
 
 }
 
-module.exports = {allProducts, specificProduct};
+const createProduct = (req,res) => {
+
+}
+
+module.exports = {allProducts, specificProduct , createProduct};
