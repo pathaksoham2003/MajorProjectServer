@@ -11,10 +11,20 @@ CREATE TABLE USERS_TABLE (
   address VARCHAR(255)
 );
 */
+/*
+CREATE TABLE ADDRESSES_TABLE (
+      address_id SERIAL PRIMARY KEY,
+      user_id INT REFERENCES USERS_TABLE(user_id),
+      street_address VARCHAR(255),
+      city VARCHAR(100),
+      state VARCHAR(100),
+      postal_code VARCHAR(20)
+    );
+*/
 (async () => {
   await client.connect();
   try {
-    const results = await client.query("SELECT * FROM USERS_TABLE");
+    const results = await client.query(`SELECT * FROM ADDRESSES_TABLE`);
     console.log(results.rows);
     console.log("Database Connection");
   } catch (err) {
