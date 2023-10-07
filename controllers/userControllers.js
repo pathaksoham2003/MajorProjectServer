@@ -44,27 +44,22 @@ const specificUser = (req,res) => {
 const createUser = (req,res) => {
     const { name , email , google_id, picture } = req.body;
     if(!name || !email || !google_id || !picture){
-        res.status(400).json({message:"Fill The Complete Data"});
-        return;
+        return res.status(400).json({message:"Fill The Complete Data"});
     }
     client.query(`SELECT * FROM USERS_TABLE WHERE google_id=$1`,[google_id],(err,result)=>{
         if(err){
-            res.status(400).json({message:"Error quering to database"});
-            return;
+            return res.status(400).json({message:"Error quering to database"});
         }
         if(result.rows.length !== 0){
-            res.status(200).json(result.rows[0]);
-            return;
+            return res.status(200).json(result.rows[0]);
         }
         client.query(`INSERT INTO USERS_TABLE (name, email, google_id, picture)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,[ name , email , google_id , picture],(err,result)=>{
             if (err) {
-                res.status(400).json({message:"Error quering to database"});
-                return;
+                return res.status(400).json({message:"Error quering to database"});
               } else {
-                res.status(200).json(result.rows[0]);
-                return;
+                return res.status(200).json(result.rows[0]);
               }
         })
     })
