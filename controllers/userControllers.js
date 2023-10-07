@@ -30,7 +30,7 @@ const allUsers = async (req,res) => {
 
 const specificUser = (req,res) => {
     const {google_id} = req.params;
-    client.query(`SELECT * FROM USERS_TABLE WHERE google_id = $1 `,[google_id],(err,result)=>{
+    client.query(`SELECT * FROM USERS_TABLE WHERE google_id = $1`,[google_id],(err,result)=>{
         if(err){
             console.log(err);
             res.status(400).json({message:`Error ${err}`});

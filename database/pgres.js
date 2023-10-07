@@ -7,8 +7,7 @@ CREATE TABLE USERS_TABLE (
   name VARCHAR(50) NOT NULL,
   email VARCHAR(50) NOT NULL UNIQUE,
   google_id VARCHAR(35) NOT NULL UNIQUE,
-  picture VARCHAR(255),
-  address VARCHAR(255)
+  picture VARCHAR(255)
 );
 */
 /*
@@ -22,7 +21,7 @@ CREATE TABLE ADDRESSES_TABLE (
     );
 */
 (async () => {
-  await client.connect();
+    await client.connect();
   try {
     const results = await client.query(`SELECT * FROM ADDRESSES_TABLE`);
     console.log(results.rows);
