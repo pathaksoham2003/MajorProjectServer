@@ -29,8 +29,8 @@ CREATE TABLE ADDRESSES_TABLE (
   } catch (err) {
     console.error("error executing query:", err);
   } finally {
-    // client.end();
-    // console.log("DISCONNECTED DATABASE")
+    client.end();
+    console.log("DISCONNECTED DATABASE")
   }
 })();
 module.exports = client;
