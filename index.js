@@ -16,6 +16,7 @@ app.get("/",(req,res)=>{
 })
 
 app.use(express.json());
+
 app.listen(8002,()=>{
     console.log("Server started at port number 3001");
 })
