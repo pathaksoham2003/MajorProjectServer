@@ -20,10 +20,24 @@ CREATE TABLE ADDRESSES_TABLE (
       postal_code VARCHAR(20)
     );
 */
+/*
+CREATE TABLE PRODUCTS_TABLE (
+    product_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price NUMERIC(10, 2) NOT NULL,
+    rating INTEGER NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    brand VARCHAR(255) NOT NULL,
+    quantity INTEGER NOT NULL,
+    mainImage TEXT NOT NULL,
+    exImg1 TEXT NOT NULL,
+    exImg2 TEXT NOT NULL
+);
+*/
 (async () => {
     await client.connect();
   try {
-    const results = await client.query(`SELECT * FROM ADDRESSES_TABLE`);
+    const results = await client.query(`SELECT * FROM PRODUCTS_TABLE`);
     console.log(results.rows);
     console.log("Database Connection");
   } catch (err) {
