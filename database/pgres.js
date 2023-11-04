@@ -6,8 +6,9 @@ CREATE TABLE USERS_TABLE (
   user_id SERIAL PRIMARY KEY,
   name VARCHAR(50) NOT NULL,
   email VARCHAR(50) NOT NULL UNIQUE,
-  google_id VARCHAR(35) NOT NULL UNIQUE,
-  picture VARCHAR(255)
+  picture VARCHAR(255),
+  password VARCHAR(40),
+  google_auth BOOLEAN DEFAULT FALSE,
 );
 */
 /*
@@ -37,7 +38,8 @@ CREATE TABLE PRODUCTS_TABLE (
 (async () => {
     await client.connect();
   try {
-    const results = await client.query(`SELECT * FROM PRODUCTS_TABLE`);
+    const results = await client.query(`SELECT * FROM USERS_TABLE 
+    `);
     console.log(results.rows);
     console.log("Database Connection");
   } catch (err) {

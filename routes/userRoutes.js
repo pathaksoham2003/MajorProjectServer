@@ -7,7 +7,7 @@ router.get("/specific/:google_id",specificUser);
 
 router.post("/create",createUser);
 
-router.delete("/delete/:google_id",deleteUser);
+router.delete("/delete/:user_id",deleteUser);
 
 // Address Specific Routes
 router.get("/address/:user_id",getAddressByUser);

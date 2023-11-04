@@ -29,8 +29,8 @@ const allUsers = async (req,res) => {
 }
 
 const specificUser = (req,res) => {
-    const {google_id} = req.params;
-    client.query(`SELECT * FROM USERS_TABLE WHERE google_id = $1`,[google_id],(err,result)=>{
+    const {user_id} = req.params;
+    client.query(`SELECT * FROM USERS_TABLE WHERE user_id = $1`,[user_id],(err,result)=>{
         if(err){
             console.log(err);
             res.status(400).json({message:`Error ${err}`});
@@ -42,20 +42,17 @@ const specificUser = (req,res) => {
 }
 
 const createUser = (req,res) => {
-    const { name , email , google_id, picture } = req.body;
-    if(!name || !email || !google_id || !picture){
+    const { name , email ,  picture } = req.body;
+    if(!name || !email || !picture){
         return res.status(400).json({message:"Fill The Complete Data"});
     }
-    client.query(`SELECT * FROM USERS_TABLE WHERE google_id=$1`,[google_id],(err,result)=>{
-        if(err){
-            return res.status(400).json({message:"Error quering to database"});
-        }
-        if(result.rows.length !== 0){
+    client.query(`SELECT * FROM USERS_TABLE WHERE email=$1`,[email],(err,result)=>{
+        if(result.rows.length > 0){
             return res.status(200).json(result.rows[0]);
         }
-        client.query(`INSERT INTO USERS_TABLE (name, email, google_id, picture)
+        client.query(`INSERT INTO USERS_TABLE (name, email, picture,google_auth)
         VALUES ($1, $2, $3, $4)
-        RETURNING *`,[ name , email , google_id , picture],(err,result)=>{
+        RETURNING *`,[ name , email , picture, true],(err,result)=>{
             if (err) {
                 return res.status(400).json({message:"Error quering to database"});
               } else {
@@ -66,8 +63,8 @@ const createUser = (req,res) => {
 }
 
 const deleteUser = (req,res) => {
-    const {google_id} = req.params;
-    client.query(`DELETE FROM USERS_TABLE WHERE google_id = $1`,[google_id],(err,result)=>{
+    const {user_id} = req.params;
+    client.query(`DELETE FROM USERS_TABLE WHERE user_id = $1`,[user_id],(err,result)=>{
         if(err){
             res.status(400).json({message:"Error Quering the database"});
             return;
