@@ -41,14 +41,38 @@ const specificUser = (req,res) => {
     })
 }
 
+const checkUser = (req,res) => {
+    const {email,password} = req.body;
+    if(!email || !password){
+        return res.status(200).json({message:"Fill The Credentials"})
+    }
+    client.query('SELECT * FROM USERS_TABLE WHERE email = $1',[email],(err,result)=>{
+        if(err){
+            return res.status(400).json({message:"Problem Quering DataBase"})
+        }
+        if(result.rows.length === 0){
+            return res.status(200).json({message:"User Doesn't Exist"})
+        }
+        if(result.rows.google_auth){
+            return res.status(200).json({message:"User Previously Authenticated With Google"})
+        }
+        client.query('SELECT * FROM USER_TABLE WHERE email = $1 AND password=$2',[email,password],(err,result)=>{
+            if(err){
+                return res.status(400).json({message:"Problem Quering DataBase"})
+            }
+            res.status(200).json(result.rows[0]);
+        })
+    })
+}
+
 const createUser = (req,res) => {
     const { name , email ,  picture } = req.body;
-    if(!name || !email || !picture){
-        return res.status(400).json({message:"Fill The Complete Data"});
+    if(!email ){
+        return res.status(200).json({message:"Email is essential"});
     }
     client.query(`SELECT * FROM USERS_TABLE WHERE email=$1`,[email],(err,result)=>{
         if(result.rows.length > 0){
-            return res.status(200).json(result.rows[0]);
+            return res.status(200).json({message:"Email Already Used"});
         }
         client.query(`INSERT INTO USERS_TABLE (name, email, picture,google_auth)
         VALUES ($1, $2, $3, $4)
@@ -98,7 +122,7 @@ const getAddressByUser = (req,res) => {
             res.status(400).json(`Error quering the database : ${err}`);
             return;
         }
-        res.status(200).json(result.rows);
+        res.status(200).json({...result.rows,message:"User Not Found"});
         return;
     })
 }
@@ -118,4 +142,4 @@ const getUserAndAddress = (req,res)=>{
 
 }
 
-module.exports = {allUsers,specificUser , createUser , deleteUser , addAddress , getAddressByUser , deleteAddress ,getUserAndAddress};
+module.exports = {allUsers,specificUser , createUser , checkUser, deleteUser , addAddress , getAddressByUser , deleteAddress ,getUserAndAddress};

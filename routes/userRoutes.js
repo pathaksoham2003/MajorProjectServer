@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const { allUsers , specificUser , createUser ,  deleteUser , updateUser , addAddress , getAddressByUser , deleteAddress ,getUserAndAddress} = require("../controllers/userControllers");
+const { allUsers , specificUser , createUser ,  deleteUser , updateUser , addAddress , getAddressByUser , deleteAddress ,getUserAndAddress, checkUser} = require("../controllers/userControllers");
 // User Specific Routes
 router.get("/all",allUsers);
 router.get("/specific/:google_id",specificUser);
 
 router.post("/create",createUser);
+
+router.post("/check",checkUser)
 
 router.delete("/delete/:user_id",deleteUser);
 
