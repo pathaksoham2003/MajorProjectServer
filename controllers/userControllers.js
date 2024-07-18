@@ -19,7 +19,6 @@ const client = require("../database/pgres.js");
 const allUsers = async (req,res) => {
     client.query(`SELECT * FROM USERS_TABLE`,(err,result)=>{
         if(err){
-            console.log(err);
             res.status(400).json({message:`Error : ${err}`});
             return;
         }
@@ -71,7 +70,10 @@ const createUser = (req,res) => {
         return res.status(200).json({message:"Email is essential"});
     }
     client.query(`SELECT * FROM USERS_TABLE WHERE email=$1`,[email],(err,result)=>{
-        if(result.rows.length > 0){
+        if(result.rows.length > 0) {
+            if(result.rows[0].google_auth){
+                return res.status(200).json(result.rows[0]); 
+            }
             return res.status(200).json({message:"Email Already Used"});
         }
         client.query(`INSERT INTO USERS_TABLE (name, email, picture,google_auth)

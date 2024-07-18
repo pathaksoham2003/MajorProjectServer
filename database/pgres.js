@@ -38,9 +38,8 @@ CREATE TABLE PRODUCTS_TABLE (
 (async () => {
     await client.connect();
   try {
-    const results = await client.query(`SELECT * FROM USERS_TABLE 
+    const results = await client.query(`SELECT * FROM PRODUCTS_TABLE 
     `);
-    console.log(results.rows);
     console.log("Database Connection");
   } catch (err) {
     console.error("error executing query:", err);
