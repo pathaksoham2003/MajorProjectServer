@@ -14,6 +14,7 @@ const byCategory = (req,res) => {
     const {category} = req.params;
     console.log(category);
     client.query(`SELECT * FROM PRODUCTS_TABLE WHERE category = $1`,[category] , (err,result)=> {
+        console.log(result)
         if(err){
             res.status(400).json({message:`Error Quering the database : ${err}`});
             return;
@@ -23,13 +24,14 @@ const byCategory = (req,res) => {
 }
 
 const specificProduct = (req,res) => {
-    const product_id = req.params;
+    const product_id = req.params.id;
     client.query(`SELECT * FROM PRODUCTS_TABLE WHERE product_id = $1`,[product_id],(err,result)=>{
         if(err){
             res.status(400).json({message:`Error Quering the database : ${err}`});
             return;
         }
-        res.status(200).json(result.rows);
+        console.log(result.rows)
+        res.status(200).json(result.rows[0]);
     })
 }
 
