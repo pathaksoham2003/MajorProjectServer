@@ -1,4 +1,7 @@
 const client = require("../database/pgres");
+const dotenv =require("dotenv");
+dotenv.config()
+const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 
 const allProducts = (req,res) => {
     client.query(`SELECT * FROM PRODUCTS_TABLE` , (err,result)=>{
@@ -53,4 +56,27 @@ const createProduct = async(req,res) => {
       }
 }
 
-module.exports = {allProducts, specificProduct , createProduct , byCategory};
+const checkoutProduct = async (req,res) => {
+    try {
+        const session = await stripe.checkout.sessions.create({
+            line_items: [
+              {
+                // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                price: 'price_1PnOUnSGzMgZse10r3Xaznbv',
+                quantity: 1,
+              },
+            ],
+            mode: 'payment',
+            success_url: `${process.env.FRONTEND_URL}/success`,
+            cancel_url: `${process.env.FRONTEND_URL}/failed`,
+          });
+        
+          res.redirect(303, session.url);
+
+    }catch(err){
+        console.log(err)
+        res.status(500).send("err",err)
+    }
+}
+
+module.exports = {allProducts, specificProduct , createProduct , byCategory,checkoutProduct};
