@@ -8,5 +8,4 @@ router.get("/category/:category",byCategory);
 router.post("/create",createProduct);
 router.post("/checkout",checkoutProduct);
 
-
 module.exports = router;
