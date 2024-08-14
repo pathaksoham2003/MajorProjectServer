@@ -67,8 +67,8 @@ const checkoutProduct = async (req,res) => {
               },
             ],
             mode: 'payment',
-            success_url: `${process.env.FRONTEND_URL}/success`,
-            cancel_url: `${process.env.FRONTEND_URL}/failed`,
+            success_url: `${process.env.FRONTEND_URL}/?payment=success`,
+            cancel_url: `${process.env.FRONTEND_URL}/?payment=failed`,
           });
         
           res.redirect(303, session.url);
