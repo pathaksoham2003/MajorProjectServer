@@ -31,7 +31,6 @@ const specificUser = (req,res) => {
     const {user_id} = req.params;
     client.query(`SELECT * FROM USERS_TABLE WHERE user_id = $1`,[user_id],(err,result)=>{
         if(err){
-            console.log(err);
             res.status(400).json({message:`Error ${err}`});
             return;
         }
