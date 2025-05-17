@@ -1,0 +1,95 @@
+const { User, Owner } = require('../models');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const sendVerificationEmail = require('../utils/sendVerificationEmail');
+
+const generateToken = (payload) => jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+
+exports.register = async (req, res) => {
+  const { email, password, phoneNumber } = req.body;
+  try {
+    const existingOwner = await Owner.findOne({ where: { email } });
+    if (existingOwner) return res.status(400).json({ message: 'Email already registered' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await Owner.create({
+      email,
+      password: hashedPassword,
+      phoneNumber,
+      isEmailVerified: false,
+    });
+
+    const token = generateToken({ id: user.id });
+    await sendVerificationEmail(email, token);
+
+    res.status(201).json({ message: 'Registered successfully. Verify your email.' });
+  } catch (err) {
+    console.log(err.message)
+    res.status(500).json({ message: 'Registration failed', error: err.message });
+  }
+};
+
+exports.verifyEmail = async (req, res) => {
+  const { token } = req.query;
+  try {
+    const { id } = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await Owner.findByPk(id);
+    if (!user) return res.status(404).json({ message: 'Owner not found' });
+
+    user.isEmailVerified = true;
+    await user.save();
+
+    res.status(200).json({ message: 'Email verified successfully' });
+  } catch (err) {
+    res.status(400).json({ message: 'Invalid or expired token' });
+  }
+};
+
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await Owner.findOne({ where: { email } });
+    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!user.isEmailVerified) return res.status(403).json({ message: 'Verify your email first' });
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(400).json({ message: 'Invalid credentials' });
+
+    const token = generateToken({ id: user.id });
+    res.status(200).json({ token });
+  } catch (err) {
+    res.status(500).json({ message: 'Login failed' });
+  }
+};
+
+exports.getOwner = async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  try {
+    const { id } = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await Owner.findByPk(id, { attributes: { exclude: ['password'] } });
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(401).json({ message: 'Unauthorized' });
+  }
+};
+
+// Google OAuth (simplified for client-provided ID token)
+exports.googleLogin = async (req, res) => {
+  const { email, name } = req.body;
+  try {
+    let user = await Owner.findOne({ where: { email } });
+    if (!user) {
+      user = await Owner.create({
+        email,
+        password: 'GOOGLE_AUTH',
+        phoneNumber: null,
+        isEmailVerified: true,
+      });
+    }
+
+    const token = generateToken({ id: user.id });
+    res.status(200).json({ token });
+  } catch (err) {
+    res.status(500).json({ message: 'Google login failed' });
+  }
+};
